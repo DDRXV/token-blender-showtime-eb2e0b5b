@@ -68,6 +68,15 @@ export default {
 					secondary: '#7E69AB',
 					light: '#E5DEFF',
 					accent: '#1EAEDB'
+				},
+				dyyota: {
+					blue: '#1A4D8C',
+					gold: '#D6B36A',
+					lightGold: '#F0D8A8',
+					lightBlue: '#E6EEF7',
+					white: '#FFFFFF',
+					gray: '#F5F5F5',
+					darkGray: '#333333'
 				}
 			},
 			borderRadius: {

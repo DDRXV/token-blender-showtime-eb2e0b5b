@@ -40,55 +40,54 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
 
   return (
     <div 
-      className={`transition-all duration-500 space-y-4 ${showResults ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'}`}
+      className={`transition-all duration-500 ${showResults ? 'opacity-100' : 'opacity-0'}`}
     >
-      <div className="text-center mb-4">
-        <div className="inline-flex gap-6 p-3 bg-gray-50 rounded-lg">
-          <div>
-            <span className="text-sm text-gray-500">Words:</span>
-            <p className="font-bold text-lg">{wordCount}</p>
+      <Card className="p-4 bg-white shadow-md border-dyyota-lightBlue">
+        <div className="flex justify-between items-center mb-4 px-2">
+          <div className="flex items-center gap-4">
+            <div>
+              <span className="text-xs text-dyyota-blue font-medium">Words</span>
+              <p className="font-bold text-lg text-dyyota-darkGray">{wordCount}</p>
+            </div>
+            <div className="h-10 border-r border-dyyota-lightBlue"></div>
+            <div>
+              <span className="text-xs text-dyyota-blue font-medium">Tokens</span>
+              <p className="font-bold text-lg text-dyyota-darkGray">{tokenCount}</p>
+            </div>
           </div>
-          <div className="border-r border-gray-300"></div>
           <div>
-            <span className="text-sm text-gray-500">Tokens:</span>
-            <p className="font-bold text-lg">{tokenCount}</p>
-          </div>
-          <div className="border-r border-gray-300"></div>
-          <div>
-            <span className="text-sm text-gray-500">Model:</span>
-            <p className="font-bold text-lg">{getModelDisplayName(model)}</p>
+            <span className="text-xs text-dyyota-blue font-medium">Model</span>
+            <p className="font-bold text-lg text-dyyota-darkGray">{getModelDisplayName(model)}</p>
           </div>
         </div>
-      </div>
-      
-      <Card className="p-6">
-        <h3 className="font-medium mb-3">Tokens:</h3>
-        <div className="flex flex-wrap gap-2">
-          {tokens.map((token, idx) => (
-            <TokenDisplay 
-              key={idx} 
-              token={token.text} 
-              tokenId={token.id}
-              color={TOKEN_COLORS[idx % TOKEN_COLORS.length]} 
-              index={idx} 
-            />
-          ))}
+
+        <div className="bg-dyyota-lightBlue/30 rounded-lg p-3 mb-4">
+          <h3 className="font-medium text-sm text-dyyota-blue mb-2">Tokens:</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {tokens.map((token, idx) => (
+              <TokenDisplay 
+                key={idx} 
+                token={token.text} 
+                tokenId={token.id}
+                color={TOKEN_COLORS[idx % TOKEN_COLORS.length]} 
+                index={idx} 
+              />
+            ))}
+          </div>
+        </div>
+        
+        <div className="text-xs text-dyyota-darkGray/80 bg-dyyota-gray p-3 rounded-lg">
+          <h3 className="font-medium mb-1 text-dyyota-blue">About Tokenization</h3>
+          <p>
+            Tokens are the basic units that language models process. Understanding tokenization helps optimize prompts and 
+            estimate costs for API usage.
+          </p>
+          <p className="mt-2">
+            <strong className="text-dyyota-blue">{getModelDisplayName(model)}:</strong> {' '}
+            {getModelDescription(model)}
+          </p>
         </div>
       </Card>
-      
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <h3 className="font-medium mb-2 text-sm">What are tokens?</h3>
-        <p className="text-sm text-gray-600">
-          Tokens are the basic units that language models process. They can be words,
-          parts of words, or even punctuation. Models like GPT-4 have a maximum token limit for both
-          input and output. Understanding tokenization helps you optimize your prompts and 
-          estimate costs for API usage.
-        </p>
-        <p className="text-sm text-gray-600 mt-2">
-          <strong>{getModelDisplayName(model)} tokenization:</strong> {' '}
-          {getModelDescription(model)}
-        </p>
-      </div>
     </div>
   );
 };

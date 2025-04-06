@@ -17,8 +17,8 @@ interface TokenizerHeaderProps {
 export const TokenizerHeader: React.FC<TokenizerHeaderProps> = ({ model, onModelChange }) => {
   return (
     <div className="text-center">
-      <h1 className="text-3xl font-bold text-blender-primary mb-3">Token Blender</h1>
-      <p className="text-gray-600 mb-6">
+      <h1 className="text-2xl font-bold text-dyyota-blue mb-1">Token Blender</h1>
+      <p className="text-dyyota-darkGray text-sm">
         Compare how different language models tokenize your text
       </p>
     </div>

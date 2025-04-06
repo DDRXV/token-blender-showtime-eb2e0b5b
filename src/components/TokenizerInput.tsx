@@ -28,18 +28,18 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
   const [inputText, setInputText] = useState<string>("");
 
   return (
-    <Card className="p-6">
+    <Card className="bg-white shadow-md border-dyyota-lightBlue p-4 mb-4">
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          <label htmlFor="text-input" className="text-sm font-medium">
-            Enter a sentence:
+          <label htmlFor="text-input" className="text-sm font-medium text-dyyota-darkGray">
+            Enter text to tokenize:
           </label>
-          <div className="w-48">
+          <div className="w-36">
             <Select 
               value={model}
               onValueChange={(value: TokenizationModel) => onModelChange(value)}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-dyyota-lightBlue border-dyyota-blue/20">
                 <SelectValue placeholder="Select model" />
               </SelectTrigger>
               <SelectContent>
@@ -55,7 +55,7 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type your sentence here..."
-            className="flex-1"
+            className="flex-1 border-dyyota-blue/20 focus-visible:ring-dyyota-blue/30"
             onKeyDown={(e) => {
               if (e.key === 'Enter') onTokenize(inputText);
             }}
@@ -63,6 +63,7 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
           <Button 
             onClick={() => onTokenize(inputText)}
             disabled={isProcessing}
+            className="bg-dyyota-blue hover:bg-dyyota-blue/90 text-white"
           >
             Tokenize
           </Button>

@@ -18,11 +18,13 @@ export const TokenizerAnimation: React.FC<TokenizerAnimationProps> = ({ isProces
   };
 
   return (
-    <div className={`transition-all duration-500 ${isProcessing ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-      <BlenderIcon isActive={isProcessing} />
-      <p className="text-center text-sm text-gray-500 animate-pulse mt-2">
-        Tokenizing with {getModelDisplayName(model)} model...
-      </p>
+    <div className={`transition-all duration-500 flex justify-center ${isProcessing ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+      <div className="relative">
+        <BlenderIcon isActive={isProcessing} />
+        <p className="text-center text-xs text-dyyota-blue animate-pulse mt-2 absolute w-full">
+          Tokenizing with {getModelDisplayName(model)} model...
+        </p>
+      </div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-export type TokenizationModel = 'chatgpt' | 'claude' | 'gemma' | 'llama';
+export type TokenizationModel = 'chatgpt' | 'llama';
 
 export interface Token {
   text: string;

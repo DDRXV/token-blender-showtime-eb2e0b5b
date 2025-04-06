@@ -24,8 +24,6 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
   const getModelDisplayName = (model: TokenizationModel) => {
     switch (model) {
       case 'chatgpt': return 'ChatGPT';
-      case 'claude': return 'Claude';
-      case 'gemma': return 'Gemma';
       case 'llama': return 'Llama';
       default: return model;
     }
@@ -35,10 +33,6 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
     switch (model) {
       case 'chatgpt':
         return 'Uses Byte-level BPE tokenization. This allows it to handle any Unicode text by breaking it into subwords.';
-      case 'claude':
-        return 'Typically uses a more granular BPE tokenization, often breaking words into smaller pieces than ChatGPT.';
-      case 'gemma':
-        return 'Uses SentencePiece tokenization trained on multilingual data with a vocabulary size optimized for efficiency.';
       case 'llama':
         return 'Employs byte-pair encoding with a specialized vocabulary focusing on code and multiple languages.';
     }

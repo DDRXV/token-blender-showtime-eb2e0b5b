@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { tokenizeWithChatGPT } from '../utils/tokenizers/chatGptTokenizer';
-import { simulateClaudeBPE } from '../utils/tokenizers/claudeTokenizer';
-import { tokenizeWithGemma, tokenizeWithLlama, initializeHuggingFaceTokenizer } from '../utils/tokenizers/huggingFaceTokenizers';
+import { simulateLlamaTokenization } from '../utils/tokenizers/llamaTokenizer';
 import { Token, TokenizationModel } from '../utils/types';
 import { get_encoding } from 'tiktoken';
 
@@ -23,9 +22,6 @@ export const useTokenizer = () => {
         const encoding = await get_encoding("cl100k_base");
         encoding.free();
         setIsEncodingReady(true);
-
-        // Initialize HuggingFace tokenizer for Gemma and Llama
-        await initializeHuggingFaceTokenizer();
       } catch (error) {
         console.error("Failed to initialize tokenizers:", error);
         toast.error("Failed to initialize tokenizers. Please try reloading the page.");
@@ -57,16 +53,8 @@ export const useTokenizer = () => {
         case 'chatgpt':
           tokensList = await tokenizeWithChatGPT(text);
           break;
-        case 'claude':
-          tokensList = simulateClaudeBPE(text);
-          console.log("Claude tokenization complete", tokensList);
-          break;
-        case 'gemma':
-          tokensList = await tokenizeWithGemma(text);
-          console.log("Gemma tokenization complete", tokensList);
-          break;
         case 'llama':
-          tokensList = await tokenizeWithLlama(text);
+          tokensList = simulateLlamaTokenization(text);
           console.log("Llama tokenization complete", tokensList);
           break;
       }

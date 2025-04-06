@@ -44,8 +44,6 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="chatgpt">ChatGPT</SelectItem>
-                <SelectItem value="claude">Claude</SelectItem>
-                <SelectItem value="gemma">Gemma</SelectItem>
                 <SelectItem value="llama">Llama</SelectItem>
               </SelectContent>
             </Select>

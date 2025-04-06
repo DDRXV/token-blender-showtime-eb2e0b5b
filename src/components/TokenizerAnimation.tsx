@@ -12,8 +12,6 @@ export const TokenizerAnimation: React.FC<TokenizerAnimationProps> = ({ isProces
   const getModelDisplayName = (model: TokenizationModel) => {
     switch (model) {
       case 'chatgpt': return 'ChatGPT';
-      case 'claude': return 'Claude';
-      case 'gemma': return 'Gemma';
       case 'llama': return 'Llama';
       default: return model;
     }

@@ -1,19 +1,11 @@
 import { Token } from '../types';
 
-// Basic BPE tokenization for Claude (simplified simulation)
-export const simulateClaudeBPE = (text: string): Token[] => {
+// Simplified Llama tokenization simulation
+export const simulateLlamaTokenization = (text: string): Token[] => {
   if (!text) return [];
   
-  // This is a simplified simulation of Claude's BPE approach
-  // Note: This is not Claude's actual tokenizer, just a demonstration
-  
-  // Basic rules for this simplified Claude tokenizer simulation:
-  // 1. Split on spaces
-  // 2. Split remaining chunks into smaller fragments (2-3 characters)
-  // 3. Keep punctuation separate
-  
   const tokens: Token[] = [];
-  let tokenId = 10000; // Starting with different range than GPT tokens
+  let tokenId = 30000; // Starting with a different range for Llama tokens
   
   // Split by spaces first
   const words = text.split(/(\s+)/);
@@ -27,25 +19,25 @@ export const simulateClaudeBPE = (text: string): Token[] => {
       continue;
     }
     
-    // Handle punctuation
+    // Split by punctuation
     const chunks = word.split(/([.,!?;:()[\]{}"'«»„"‟"'‚'‹›-])/);
     
     for (const chunk of chunks) {
       if (!chunk) continue;
       
-      // For punctuation and very short chunks
-      if (chunk.length <= 1) {
+      // For very short words, keep them as is
+      if (chunk.length <= 2) {
         tokens.push({ text: chunk, id: tokenId++ });
         continue;
       }
       
-      // For normal words, simulate breaking into smaller chunks
-      // Claude tends to tokenize more granularly
+      // For longer words, simulate subword tokenization
+      // Llama's BPE tends to create slightly different chunk sizes than Claude
       let i = 0;
       while (i < chunk.length) {
-        // Randomly choose 1, 2, or 3 characters to simulate subword tokenization
+        // Randomly choose 1-4 characters to simulate subword tokenization
         const chunkSize = Math.min(
-          1 + Math.floor(Math.random() * 2),
+          1 + Math.floor(Math.random() * 3), // 1, 2, or 3 characters
           chunk.length - i
         );
         

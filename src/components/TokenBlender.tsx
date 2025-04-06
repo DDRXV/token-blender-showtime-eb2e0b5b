@@ -81,7 +81,7 @@ export const TokenBlender: React.FC = () => {
         
         {/* Mobile Animation */}
         {isMobile && isProcessing && (
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center w-full"> {/* Added items-center for vertical and horizontal centering */}
             <div className="bg-white/90 p-4 rounded-xl shadow-lg">
               <TokenizerAnimation 
                 isProcessing={isProcessing}

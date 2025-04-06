@@ -66,31 +66,38 @@ export const TokenBlender: React.FC = () => {
       )}
       
       <div className="grid grid-cols-1 gap-5">
-        <div className="flex items-center">
-          <div className="flex-1">
-            <TokenizerInput 
-              onTokenize={handleTokenize}
-              isProcessing={isProcessing || isLoading}
-              model={model}
-              onModelChange={setModel}
-            />
-          </div>
-          <div className="w-24">
-            <TokenizerAnimation 
-              isProcessing={isProcessing}
-              model={model}
-            />
-          </div>
+        {/* Input section */}
+        <div>
+          <TokenizerInput 
+            onTokenize={handleTokenize}
+            isProcessing={isProcessing || isLoading}
+            model={model}
+            onModelChange={setModel}
+          />
         </div>
         
-        <div>
-          <TokenizerResults 
-            showResults={showResults}
-            wordCount={wordCount}
-            tokenCount={tokenCount}
-            model={model}
-            tokens={tokens}
-          />
+        {/* Results and animation section */}
+        <div className="relative">
+          {/* Centered animation that shows during processing */}
+          <div className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${isProcessing ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+              <TokenizerAnimation 
+                isProcessing={isProcessing}
+                model={model}
+              />
+            </div>
+          </div>
+          
+          {/* Results with opacity transition */}
+          <div className={`transition-opacity duration-500 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}>
+            <TokenizerResults 
+              showResults={showResults}
+              wordCount={wordCount}
+              tokenCount={tokenCount}
+              model={model}
+              tokens={tokens}
+            />
+          </div>
         </div>
       </div>
     </div>

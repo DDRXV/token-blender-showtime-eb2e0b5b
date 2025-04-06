@@ -1,3 +1,4 @@
+
 import { Token } from '../types';
 import { pipeline } from '@huggingface/transformers';
 
@@ -8,8 +9,11 @@ let llamaTokenizer: any = null;
 export const initializeLlamaTokenizer = async () => {
   if (!llamaTokenizer) {
     try {
-      // Using pipeline for tokenization from transformers.js
-      llamaTokenizer = await pipeline('tokenization', 'meta-llama/Llama-2-7b-hf');
+      // Using pipeline for text generation since it includes tokenization
+      llamaTokenizer = await pipeline('text-generation', 'meta-llama/Llama-2-7b-hf', {
+        tokenizer: true,
+        model: false // Only load tokenizer, not the model
+      });
       console.log("Llama tokenizer initialized successfully");
       return true;
     } catch (error) {
@@ -31,13 +35,15 @@ export const tokenizeWithLlama = async (text: string): Promise<Token[]> => {
   }
   
   try {
-    const tokenization = await llamaTokenizer(text);
+    // Get the tokenizer from the pipeline
+    const tokenizer = llamaTokenizer.tokenizer;
+    const tokenization = tokenizer.encode(text);
     console.log("Raw Llama tokenization result:", tokenization);
     
     // Convert the tokenization result to our Token interface
     const tokens: Token[] = tokenization.tokens.map((token: string, index: number) => ({
       text: token,
-      id: tokenization.input_ids[index]
+      id: tokenization.ids[index]
     }));
     
     return tokens;

@@ -19,7 +19,7 @@ export const TokenizerAnimation: React.FC<TokenizerAnimationProps> = ({ isProces
   return (
     <div className={`transition-all duration-500 flex flex-col items-center justify-center ${isProcessing ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
       <div className="relative">
-        <div className={`w-48 h-48 relative`}>
+        <div className={`w-36 sm:w-48 h-36 sm:h-48 relative`}>
           {/* Container with fixed position */}
           <div className="w-full h-full flex items-center justify-center">
             {/* Rotating blender image */}

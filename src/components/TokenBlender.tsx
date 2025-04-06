@@ -8,9 +8,11 @@ import { useTokenizer } from '../hooks/useTokenizer';
 import { TokenizationModel } from '../utils/types';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const TokenBlender: React.FC = () => {
   const [model, setModel] = useState<TokenizationModel>('chatgpt');
+  const isMobile = useIsMobile();
   const {
     isEncodingReady,
     isLlamaReady,
@@ -44,7 +46,7 @@ export const TokenBlender: React.FC = () => {
   const initStatus = getInitializationStatus();
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
       <TokenizerHeader 
         model={model}
         onModelChange={setModel}
@@ -73,6 +75,7 @@ export const TokenBlender: React.FC = () => {
             isProcessing={isProcessing || isLoading}
             model={model}
             onModelChange={setModel}
+            isMobile={isMobile}
           />
         </div>
         
@@ -80,7 +83,7 @@ export const TokenBlender: React.FC = () => {
         <div className="relative">
           {/* Centered animation that shows during processing */}
           <div className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${isProcessing ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg">
+            <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-lg">
               <TokenizerAnimation 
                 isProcessing={isProcessing}
                 model={model}
@@ -96,6 +99,7 @@ export const TokenBlender: React.FC = () => {
               tokenCount={tokenCount}
               model={model}
               tokens={tokens}
+              isMobile={isMobile}
             />
           </div>
         </div>

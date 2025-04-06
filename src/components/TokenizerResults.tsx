@@ -12,6 +12,7 @@ interface TokenizerResultsProps {
   tokenCount: number;
   model: TokenizationModel;
   tokens: Token[];
+  isMobile?: boolean;
 }
 
 export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
@@ -19,7 +20,8 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
   wordCount,
   tokenCount,
   model,
-  tokens
+  tokens,
+  isMobile = false
 }) => {
   const getModelDisplayName = (model: TokenizationModel) => {
     switch (model) {
@@ -42,27 +44,44 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
     <div 
       className={`transition-all duration-500 ${showResults ? 'opacity-100' : 'opacity-0'}`}
     >
-      <Card className="p-4 bg-white shadow-md border-dyyota-lightBlue">
-        <div className="flex items-center mb-4 px-2">
-          <div className="flex items-center gap-6">
-            <div>
+      <Card className="p-3 sm:p-4 bg-white shadow-md border-dyyota-lightBlue">
+        {isMobile ? (
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="text-center">
               <span className="text-xs text-dyyota-blue font-medium">Words</span>
               <p className="font-bold text-lg text-dyyota-darkGray">{wordCount}</p>
             </div>
-            <div className="h-10 border-r border-dyyota-lightBlue"></div>
-            <div>
+            <div className="text-center border-x border-dyyota-lightBlue">
               <span className="text-xs text-dyyota-blue font-medium">Tokens</span>
               <p className="font-bold text-lg text-dyyota-darkGray">{tokenCount}</p>
             </div>
-            <div className="h-10 border-r border-dyyota-lightBlue"></div>
-            <div>
+            <div className="text-center">
               <span className="text-xs text-dyyota-blue font-medium">Model</span>
               <p className="font-bold text-lg text-dyyota-darkGray">{getModelDisplayName(model)}</p>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center mb-4 px-2">
+            <div className="flex items-center gap-6">
+              <div>
+                <span className="text-xs text-dyyota-blue font-medium">Words</span>
+                <p className="font-bold text-lg text-dyyota-darkGray">{wordCount}</p>
+              </div>
+              <div className="h-10 border-r border-dyyota-lightBlue"></div>
+              <div>
+                <span className="text-xs text-dyyota-blue font-medium">Tokens</span>
+                <p className="font-bold text-lg text-dyyota-darkGray">{tokenCount}</p>
+              </div>
+              <div className="h-10 border-r border-dyyota-lightBlue"></div>
+              <div>
+                <span className="text-xs text-dyyota-blue font-medium">Model</span>
+                <p className="font-bold text-lg text-dyyota-darkGray">{getModelDisplayName(model)}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <div className="bg-dyyota-lightBlue/30 rounded-lg p-3 mb-4">
+        <div className="bg-dyyota-lightBlue/30 rounded-lg p-2 sm:p-3 mb-4">
           <h3 className="font-medium text-sm text-dyyota-blue mb-2">Tokens:</h3>
           <div className="flex flex-wrap gap-1.5">
             {tokens.map((token, idx) => (
@@ -77,7 +96,7 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
           </div>
         </div>
         
-        <div className="text-xs text-dyyota-darkGray/80 bg-dyyota-gray p-3 rounded-lg">
+        <div className="text-xs text-dyyota-darkGray/80 bg-dyyota-gray p-2 sm:p-3 rounded-lg">
           <h3 className="font-medium mb-1 text-dyyota-blue">About Tokenization</h3>
           <p>
             Tokens are the basic units that language models process. Understanding tokenization helps optimize prompts and 

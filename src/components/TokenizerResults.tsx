@@ -43,8 +43,8 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
       className={`transition-all duration-500 ${showResults ? 'opacity-100' : 'opacity-0'}`}
     >
       <Card className="p-4 bg-white shadow-md border-dyyota-lightBlue">
-        <div className="flex justify-between items-center mb-4 px-2">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center mb-4 px-2">
+          <div className="flex items-center gap-6">
             <div>
               <span className="text-xs text-dyyota-blue font-medium">Words</span>
               <p className="font-bold text-lg text-dyyota-darkGray">{wordCount}</p>
@@ -54,10 +54,11 @@ export const TokenizerResults: React.FC<TokenizerResultsProps> = ({
               <span className="text-xs text-dyyota-blue font-medium">Tokens</span>
               <p className="font-bold text-lg text-dyyota-darkGray">{tokenCount}</p>
             </div>
-          </div>
-          <div>
-            <span className="text-xs text-dyyota-blue font-medium">Model</span>
-            <p className="font-bold text-lg text-dyyota-darkGray">{getModelDisplayName(model)}</p>
+            <div className="h-10 border-r border-dyyota-lightBlue"></div>
+            <div>
+              <span className="text-xs text-dyyota-blue font-medium">Model</span>
+              <p className="font-bold text-lg text-dyyota-darkGray">{getModelDisplayName(model)}</p>
+            </div>
           </div>
         </div>
 

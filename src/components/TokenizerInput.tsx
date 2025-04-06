@@ -68,9 +68,6 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
             Tokenize
           </Button>
         </div>
-        <div className="text-xs text-dyyota-darkGray/70 italic">
-          Press Ctrl+Enter to tokenize quickly
-        </div>
       </div>
     </Card>
   );

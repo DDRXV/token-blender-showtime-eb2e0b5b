@@ -17,7 +17,7 @@ const TOKEN_COLORS = [
 
 export const TokenBlender: React.FC = () => {
   const [inputText, setInputText] = useState<string>("");
-  const [tokens, setTokens] = useState<string[]>([]);
+  const [tokens, setTokens] = useState<{ text: string; id: number }[]>([]);
   const [wordCount, setWordCount] = useState<number>(0);
   const [tokenCount, setTokenCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -65,20 +65,21 @@ export const TokenBlender: React.FC = () => {
       const tokenIds = encoding.encode(text);
       console.log("Text encoded, token IDs:", tokenIds);
       
-      // Decode each token ID back to its string representation
-      const tokenStrings = Array.from(tokenIds).map(id => {
+      // Decode each token ID back to its string representation and create token objects
+      const tokenObjects = Array.from(tokenIds).map(id => {
         try {
-          return encoding.decode_single_token_bytes(id).toString();
+          const tokenText = encoding.decode_single_token_bytes(id).toString();
+          return { text: tokenText, id };
         } catch (e) {
           console.error("Error decoding token:", id, e);
-          return "[error]";
+          return { text: "[error]", id };
         }
       });
       
       // Count words (simple space-based splitting for now)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);
       
-      setTokens(tokenStrings);
+      setTokens(tokenObjects);
       setWordCount(words.length);
       setTokenCount(tokenIds.length);
       
@@ -164,7 +165,8 @@ export const TokenBlender: React.FC = () => {
             {tokens.map((token, idx) => (
               <TokenDisplay 
                 key={idx} 
-                token={token} 
+                token={token.text} 
+                tokenId={token.id}
                 color={TOKEN_COLORS[idx % TOKEN_COLORS.length]} 
                 index={idx} 
               />

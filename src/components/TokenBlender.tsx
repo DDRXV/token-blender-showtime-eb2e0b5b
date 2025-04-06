@@ -23,28 +23,31 @@ export const TokenBlender: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-4">
+    <div className="w-full max-w-4xl mx-auto">
       <TokenizerHeader 
         model={model}
         onModelChange={setModel}
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-1">
-          <TokenizerInput 
-            onTokenize={handleTokenize}
-            isProcessing={isProcessing}
-            model={model}
-            onModelChange={setModel}
-          />
-          
-          <TokenizerAnimation 
-            isProcessing={isProcessing}
-            model={model}
-          />
+      <div className="grid grid-cols-1 gap-4">
+        <div className="flex items-center">
+          <div className="flex-1">
+            <TokenizerInput 
+              onTokenize={handleTokenize}
+              isProcessing={isProcessing}
+              model={model}
+              onModelChange={setModel}
+            />
+          </div>
+          <div className="w-24">
+            <TokenizerAnimation 
+              isProcessing={isProcessing}
+              model={model}
+            />
+          </div>
         </div>
         
-        <div className="lg:col-span-2">
+        <div>
           <TokenizerResults 
             showResults={showResults}
             wordCount={wordCount}

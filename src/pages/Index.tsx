@@ -5,9 +5,9 @@ import { Logo } from "@/components/Logo";
 const Index = () => {
   return (
     <div className="min-h-screen bg-dyyota-white">
-      <div className="container mx-auto px-4 flex flex-col justify-center min-h-screen py-6">
+      <div className="container mx-auto px-4 pt-4">
         <div className="flex flex-col items-center">
-          <Logo className="mb-4" />
+          <Logo className="h-12 mb-2" />
           <TokenBlender />
         </div>
       </div>

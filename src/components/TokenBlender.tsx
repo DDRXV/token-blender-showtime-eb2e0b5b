@@ -6,6 +6,7 @@ import { BlenderIcon } from './BlenderIcon';
 import { TokenDisplay } from './TokenDisplay';
 import { get_encoding } from 'tiktoken';
 import { toast } from 'sonner';
+import { pipeline } from '@huggingface/transformers';
 import {
   Select,
   SelectContent,
@@ -22,7 +23,7 @@ const TOKEN_COLORS = [
 ];
 
 // Tokenization models
-type TokenizationModel = 'chatgpt' | 'claude';
+type TokenizationModel = 'chatgpt' | 'claude' | 'gemma' | 'llama';
 
 export const TokenBlender: React.FC = () => {
   const [inputText, setInputText] = useState<string>("");
@@ -33,21 +34,27 @@ export const TokenBlender: React.FC = () => {
   const [showResults, setShowResults] = useState<boolean>(false);
   const [isEncodingReady, setIsEncodingReady] = useState<boolean>(false);
   const [model, setModel] = useState<TokenizationModel>('chatgpt');
-  
+  const [hfTokenizer, setHfTokenizer] = useState<any>(null);
+
   useEffect(() => {
-    // Check if tiktoken is working by initializing it once
-    const initTiktoken = async () => {
+    // Initialize tokenizers
+    const initTokenizers = async () => {
       try {
+        // Initialize tiktoken for ChatGPT
         const encoding = await get_encoding("cl100k_base");
         encoding.free();
         setIsEncodingReady(true);
+
+        // Initialize HuggingFace tokenizer for Gemma and Llama
+        const tokenizer = await pipeline('token-classification', 'google/gemma-2b');
+        setHfTokenizer(tokenizer);
       } catch (error) {
-        console.error("Failed to initialize tiktoken:", error);
-        toast.error("Failed to initialize tokenizer. Please try reloading the page.");
+        console.error("Failed to initialize tokenizers:", error);
+        toast.error("Failed to initialize tokenizers. Please try reloading the page.");
       }
     };
     
-    initTiktoken();
+    initTokenizers();
   }, []);
 
   // Basic BPE tokenization for Claude (simplified simulation)
@@ -109,6 +116,44 @@ export const TokenBlender: React.FC = () => {
     
     return tokens;
   };
+
+  // Simulate Gemma tokenization using HuggingFace transformers
+  const tokenizeWithGemma = async (text: string) => {
+    if (!hfTokenizer) return [];
+    
+    try {
+      const result = await hfTokenizer(text, {
+        model: 'google/gemma-2b',
+      });
+      
+      return result.map((token: any, index: number) => ({
+        text: token.word,
+        id: 20000 + index // Different range for Gemma tokens
+      }));
+    } catch (error) {
+      console.error("Gemma tokenization error:", error);
+      return [];
+    }
+  };
+
+  // Simulate Llama tokenization
+  const tokenizeWithLlama = async (text: string) => {
+    if (!hfTokenizer) return [];
+    
+    try {
+      const result = await hfTokenizer(text, {
+        model: 'meta-llama/Llama-2-7b',
+      });
+      
+      return result.map((token: any, index: number) => ({
+        text: token.word,
+        id: 30000 + index // Different range for Llama tokens
+      }));
+    } catch (error) {
+      console.error("Llama tokenization error:", error);
+      return [];
+    }
+  };
   
   // Tokenize the text using selected model
   const tokenizeText = async (text: string) => {
@@ -129,50 +174,59 @@ export const TokenBlender: React.FC = () => {
       let tokensList: { text: string; id: number }[] = [];
       
       // Choose tokenization method based on selected model
-      if (model === 'chatgpt') {
-        console.log("Creating OpenAI encoding...");
-        const encoding = await get_encoding("cl100k_base");
-        console.log("Encoding created");
-        
-        // Get token IDs for ChatGPT
-        const tokenIds = encoding.encode(text);
-        console.log("Text encoded, token IDs:", tokenIds);
-        
-        // Process each token ID individually
-        for (let i = 0; i < tokenIds.length; i++) {
-          const id = tokenIds[i];
+      switch (model) {
+        case 'chatgpt':
+          console.log("Creating OpenAI encoding...");
+          const encoding = await get_encoding("cl100k_base");
+          console.log("Encoding created");
           
-          // Convert the single token ID to a Uint32Array
-          const tokenIdArray = new Uint32Array([id]);
+          // Get token IDs for ChatGPT
+          const tokenIds = encoding.encode(text);
+          console.log("Text encoded, token IDs:", tokenIds);
           
-          try {
-            // Decode this single token ID to get its bytes representation
-            const bytes = encoding.decode(tokenIdArray);
+          // Process each token ID individually
+          for (let i = 0; i < tokenIds.length; i++) {
+            const id = tokenIds[i];
             
-            // Convert the bytes to a string 
-            const tokenText = String.fromCharCode(...bytes);
+            // Convert the single token ID to a Uint32Array
+            const tokenIdArray = new Uint32Array([id]);
             
-            tokensList.push({
-              text: tokenText || `<Token ${id}>`,
-              id: id
-            });
-          } catch (e) {
-            console.error(`Error decoding token ID ${id}:`, e);
-            // Fallback for tokens that can't be decoded properly
-            tokensList.push({
-              text: `<Token ${id}>`,
-              id: id
-            });
+            try {
+              // Decode this single token ID to get its bytes representation
+              const bytes = encoding.decode(tokenIdArray);
+              
+              // Convert the bytes to a string 
+              const tokenText = String.fromCharCode(...bytes);
+              
+              tokensList.push({
+                text: tokenText || `<Token ${id}>`,
+                id: id
+              });
+            } catch (e) {
+              console.error(`Error decoding token ID ${id}:`, e);
+              // Fallback for tokens that can't be decoded properly
+              tokensList.push({
+                text: `<Token ${id}>`,
+                id: id
+              });
+            }
           }
-        }
-        
-        encoding.free();
-        console.log("ChatGPT tokenization complete");
-      } else {
-        // For Claude, use our simulated BPE tokenizer
-        console.log("Using simulated Claude BPE tokenizer");
-        tokensList = simulateClaudeBPE(text);
-        console.log("Claude tokenization complete", tokensList);
+          
+          encoding.free();
+          console.log("ChatGPT tokenization complete");
+          break;
+        case 'claude':
+          tokensList = simulateClaudeBPE(text);
+          console.log("Claude tokenization complete", tokensList);
+          break;
+        case 'gemma':
+          tokensList = await tokenizeWithGemma(text);
+          console.log("Gemma tokenization complete", tokensList);
+          break;
+        case 'llama':
+          tokensList = await tokenizeWithLlama(text);
+          console.log("Llama tokenization complete", tokensList);
+          break;
       }
       
       // Count words (simple space-based splitting)
@@ -200,7 +254,7 @@ export const TokenBlender: React.FC = () => {
       <div className="text-center">
         <h1 className="text-3xl font-bold text-blender-primary mb-3">Token Blender</h1>
         <p className="text-gray-600 mb-6">
-          See how large language models tokenize your text into smaller pieces
+          Compare how different language models tokenize your text
         </p>
       </div>
       
@@ -221,6 +275,8 @@ export const TokenBlender: React.FC = () => {
                 <SelectContent>
                   <SelectItem value="chatgpt">ChatGPT</SelectItem>
                   <SelectItem value="claude">Claude</SelectItem>
+                  <SelectItem value="gemma">Gemma</SelectItem>
+                  <SelectItem value="llama">Llama</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { tokenizeWithChatGPT } from '../utils/tokenizers/chatGptTokenizer';
-import { tokenizeWithLlama, initializeLlamaTokenizer, simulateLlamaTokenization } from '../utils/tokenizers/llamaTokenizer';
+import { tokenizeWithLlama, initializeLlamaTokenizer } from '../utils/tokenizers/llamaTokenizer';
 import { Token, TokenizationModel } from '../utils/types';
 import { get_encoding } from 'tiktoken';
 
@@ -47,6 +47,11 @@ export const useTokenizer = () => {
       return;
     }
     
+    if (model === 'llama' && !isLlamaReady) {
+      toast.error("Llama tokenizer is not ready yet. Please wait a moment and try again.");
+      return;
+    }
+    
     setIsProcessing(true);
     setShowResults(false);
     
@@ -59,12 +64,7 @@ export const useTokenizer = () => {
           tokensList = await tokenizeWithChatGPT(text);
           break;
         case 'llama':
-          if (isLlamaReady) {
-            tokensList = await tokenizeWithLlama(text);
-          } else {
-            console.log("Llama tokenizer not ready, using simulation");
-            tokensList = simulateLlamaTokenization(text);
-          }
+          tokensList = await tokenizeWithLlama(text);
           console.log("Llama tokenization complete", tokensList);
           break;
       }

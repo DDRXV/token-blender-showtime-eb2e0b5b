@@ -21,6 +21,8 @@ export const TokenizerHeader: React.FC<TokenizerHeaderProps> = ({ model, onModel
       <p className="text-dyyota-darkGray text-sm">
         Compare how different language models tokenize your text
       </p>
+      
+      {/* Model selection is now handled in the TokenizerInput component */}
     </div>
   );
 };

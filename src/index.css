@@ -80,9 +80,9 @@
 
 @keyframes spin {
   from {
-    transform: translate(-50%, 0) rotate(0deg);
+    transform: rotate(0deg);
   }
   to {
-    transform: translate(-50%, 0) rotate(360deg);
+    transform: rotate(360deg);
   }
 }

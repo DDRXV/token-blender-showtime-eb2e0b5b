@@ -10,10 +10,10 @@ export const BlenderIcon: React.FC<BlenderIconProps> = ({ isActive }) => {
     <div className="flex justify-center py-4">
       <div className="relative w-48 h-48">
         {/* Blender base */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-12 bg-blender-secondary rounded-lg z-10"></div>
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-12 bg-dyyota-gold rounded-lg z-10"></div>
         
         {/* Blender jar */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-28 h-32 bg-blender-light bg-opacity-50 rounded-lg overflow-hidden border-2 border-blender-secondary">
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-28 h-32 bg-dyyota-lightBlue bg-opacity-50 rounded-lg overflow-hidden border-2 border-dyyota-gold">
           {/* Blender contents */}
           <div className="absolute inset-1 overflow-hidden">
             {isActive && (
@@ -33,8 +33,8 @@ export const BlenderIcon: React.FC<BlenderIconProps> = ({ isActive }) => {
         </div>
         
         {/* Blender lid */}
-        <div className="absolute bottom-[10.5rem] left-1/2 transform -translate-x-1/2 w-30 h-6 bg-blender-secondary rounded-t-lg z-20 flex justify-center items-center">
-          <div className="w-6 h-6 bg-blender-primary rounded-full"></div>
+        <div className="absolute bottom-[10.5rem] left-1/2 transform -translate-x-1/2 w-30 h-6 bg-dyyota-gold rounded-t-lg z-20 flex justify-center items-center">
+          <div className="w-6 h-6 bg-dyyota-blue rounded-full"></div>
         </div>
         
         {/* Blender blades */}

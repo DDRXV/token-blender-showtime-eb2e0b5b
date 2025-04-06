@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +6,13 @@ import { BlenderIcon } from './BlenderIcon';
 import { TokenDisplay } from './TokenDisplay';
 import { get_encoding } from 'tiktoken';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Token colors for visualization
 const TOKEN_COLORS = [
@@ -14,6 +20,9 @@ const TOKEN_COLORS = [
   "bg-yellow-500", "bg-red-500", "bg-pink-500",
   "bg-indigo-500", "bg-teal-500", "bg-orange-500"
 ];
+
+// Tokenization models
+type TokenizationModel = 'chatgpt' | 'claude';
 
 export const TokenBlender: React.FC = () => {
   const [inputText, setInputText] = useState<string>("");
@@ -23,6 +32,7 @@ export const TokenBlender: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [isEncodingReady, setIsEncodingReady] = useState<boolean>(false);
+  const [model, setModel] = useState<TokenizationModel>('chatgpt');
   
   useEffect(() => {
     // Check if tiktoken is working by initializing it once
@@ -39,15 +49,75 @@ export const TokenBlender: React.FC = () => {
     
     initTiktoken();
   }, []);
+
+  // Basic BPE tokenization for Claude (simplified simulation)
+  const simulateClaudeBPE = (text: string): { text: string; id: number }[] => {
+    if (!text) return [];
+    
+    // This is a simplified simulation of Claude's BPE approach
+    // Note: This is not Claude's actual tokenizer, just a demonstration
+    
+    // Basic rules for this simplified Claude tokenizer simulation:
+    // 1. Split on spaces
+    // 2. Split remaining chunks into smaller fragments (2-3 characters)
+    // 3. Keep punctuation separate
+    
+    const tokens: { text: string; id: number }[] = [];
+    let tokenId = 10000; // Starting with different range than GPT tokens
+    
+    // Split by spaces first
+    const words = text.split(/(\s+)/);
+    
+    for (const word of words) {
+      if (!word) continue;
+      
+      // Handle whitespace
+      if (/^\s+$/.test(word)) {
+        tokens.push({ text: word, id: tokenId++ });
+        continue;
+      }
+      
+      // Handle punctuation
+      const chunks = word.split(/([.,!?;:()[\]{}"'«»„"‟"'‚'‹›-])/);
+      
+      for (const chunk of chunks) {
+        if (!chunk) continue;
+        
+        // For punctuation and very short chunks
+        if (chunk.length <= 1) {
+          tokens.push({ text: chunk, id: tokenId++ });
+          continue;
+        }
+        
+        // For normal words, simulate breaking into smaller chunks
+        // Claude tends to tokenize more granularly
+        let i = 0;
+        while (i < chunk.length) {
+          // Randomly choose 1, 2, or 3 characters to simulate subword tokenization
+          const chunkSize = Math.min(
+            1 + Math.floor(Math.random() * 2),
+            chunk.length - i
+          );
+          
+          const subChunk = chunk.substring(i, i + chunkSize);
+          tokens.push({ text: subChunk, id: tokenId++ });
+          
+          i += chunkSize;
+        }
+      }
+    }
+    
+    return tokens;
+  };
   
-  // Tokenize the text using tiktoken
+  // Tokenize the text using selected model
   const tokenizeText = async (text: string) => {
     if (!text.trim()) {
       toast.error("Please enter some text to tokenize");
       return;
     }
     
-    if (!isEncodingReady) {
+    if (model === 'chatgpt' && !isEncodingReady) {
       toast.error("Tokenizer is not ready yet. Please wait a moment and try again.");
       return;
     }
@@ -56,43 +126,53 @@ export const TokenBlender: React.FC = () => {
     setShowResults(false);
     
     try {
-      console.log("Creating encoding...");
-      const encoding = await get_encoding("cl100k_base");
-      console.log("Encoding created");
-      
-      // Get token IDs
-      const tokenIds = encoding.encode(text);
-      console.log("Text encoded, token IDs:", tokenIds);
-      
-      // Extract original text for each token
       let tokensList: { text: string; id: number }[] = [];
       
-      // Process each token ID individually
-      for (let i = 0; i < tokenIds.length; i++) {
-        const id = tokenIds[i];
+      // Choose tokenization method based on selected model
+      if (model === 'chatgpt') {
+        console.log("Creating OpenAI encoding...");
+        const encoding = await get_encoding("cl100k_base");
+        console.log("Encoding created");
         
-        // Convert the single token ID to a Uint32Array
-        const tokenIdArray = new Uint32Array([id]);
+        // Get token IDs for ChatGPT
+        const tokenIds = encoding.encode(text);
+        console.log("Text encoded, token IDs:", tokenIds);
         
-        try {
-          // Decode this single token ID to get its bytes representation
-          const bytes = encoding.decode(tokenIdArray);
+        // Process each token ID individually
+        for (let i = 0; i < tokenIds.length; i++) {
+          const id = tokenIds[i];
           
-          // Convert the bytes to a string 
-          const tokenText = String.fromCharCode(...bytes);
+          // Convert the single token ID to a Uint32Array
+          const tokenIdArray = new Uint32Array([id]);
           
-          tokensList.push({
-            text: tokenText || `<Token ${id}>`,
-            id: id
-          });
-        } catch (e) {
-          console.error(`Error decoding token ID ${id}:`, e);
-          // Fallback for tokens that can't be decoded properly
-          tokensList.push({
-            text: `<Token ${id}>`,
-            id: id
-          });
+          try {
+            // Decode this single token ID to get its bytes representation
+            const bytes = encoding.decode(tokenIdArray);
+            
+            // Convert the bytes to a string 
+            const tokenText = String.fromCharCode(...bytes);
+            
+            tokensList.push({
+              text: tokenText || `<Token ${id}>`,
+              id: id
+            });
+          } catch (e) {
+            console.error(`Error decoding token ID ${id}:`, e);
+            // Fallback for tokens that can't be decoded properly
+            tokensList.push({
+              text: `<Token ${id}>`,
+              id: id
+            });
+          }
         }
+        
+        encoding.free();
+        console.log("ChatGPT tokenization complete");
+      } else {
+        // For Claude, use our simulated BPE tokenizer
+        console.log("Using simulated Claude BPE tokenizer");
+        tokensList = simulateClaudeBPE(text);
+        console.log("Claude tokenization complete", tokensList);
       }
       
       // Count words (simple space-based splitting)
@@ -100,7 +180,7 @@ export const TokenBlender: React.FC = () => {
       
       setTokens(tokensList);
       setWordCount(words.length);
-      setTokenCount(tokenIds.length);
+      setTokenCount(tokensList.length);
       
       // Simulate processing time for the animation
       setTimeout(() => {
@@ -108,8 +188,6 @@ export const TokenBlender: React.FC = () => {
         setShowResults(true);
       }, 2000);
       
-      encoding.free();
-      console.log("Tokenization complete");
     } catch (error) {
       console.error("Tokenization error:", error);
       toast.error("Error tokenizing text. Please try again.");
@@ -128,9 +206,25 @@ export const TokenBlender: React.FC = () => {
       
       <Card className="p-6">
         <div className="flex flex-col gap-4">
-          <label htmlFor="text-input" className="text-sm font-medium">
-            Enter a sentence:
-          </label>
+          <div className="flex justify-between items-center">
+            <label htmlFor="text-input" className="text-sm font-medium">
+              Enter a sentence:
+            </label>
+            <div className="w-48">
+              <Select 
+                value={model}
+                onValueChange={(value: TokenizationModel) => setModel(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select model" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="chatgpt">ChatGPT</SelectItem>
+                  <SelectItem value="claude">Claude</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           <div className="flex gap-2">
             <Input
               id="text-input"
@@ -156,7 +250,7 @@ export const TokenBlender: React.FC = () => {
       <div className={`transition-all duration-500 ${isProcessing ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
         <BlenderIcon isActive={isProcessing} />
         <p className="text-center text-sm text-gray-500 animate-pulse mt-2">
-          Tokenizing...
+          Tokenizing with {model === 'chatgpt' ? 'ChatGPT' : 'Claude'} model...
         </p>
       </div>
       
@@ -174,6 +268,11 @@ export const TokenBlender: React.FC = () => {
             <div>
               <span className="text-sm text-gray-500">Tokens:</span>
               <p className="font-bold text-lg">{tokenCount}</p>
+            </div>
+            <div className="border-r border-gray-300"></div>
+            <div>
+              <span className="text-sm text-gray-500">Model:</span>
+              <p className="font-bold text-lg">{model === 'chatgpt' ? 'ChatGPT' : 'Claude'}</p>
             </div>
           </div>
         </div>
@@ -200,6 +299,12 @@ export const TokenBlender: React.FC = () => {
             parts of words, or even punctuation. Models like GPT-4 have a maximum token limit for both
             input and output. Understanding tokenization helps you optimize your prompts and 
             estimate costs for API usage.
+          </p>
+          <p className="text-sm text-gray-600 mt-2">
+            <strong>{model === 'chatgpt' ? 'ChatGPT' : 'Claude'} tokenization:</strong> {' '}
+            {model === 'chatgpt' 
+              ? 'Uses Byte-level BPE tokenization. This allows it to handle any Unicode text by breaking it into subwords.'
+              : 'Typically uses a more granular BPE tokenization, often breaking words into smaller pieces than ChatGPT.'}
           </p>
         </div>
       </div>

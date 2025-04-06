@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TokenizationModel } from '../utils/types';
 
 interface TokenizerAnimationProps {
@@ -8,6 +8,19 @@ interface TokenizerAnimationProps {
 }
 
 export const TokenizerAnimation: React.FC<TokenizerAnimationProps> = ({ isProcessing, model }) => {
+  const [isBlinking, setIsBlinking] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Set up blinking animation when processing
+    if (isProcessing) {
+      const blinkInterval = setInterval(() => {
+        setIsBlinking(prev => !prev);
+      }, 2500); // Blink every 2.5 seconds
+      
+      return () => clearInterval(blinkInterval);
+    }
+  }, [isProcessing]);
+  
   const getModelDisplayName = (model: TokenizationModel) => {
     switch (model) {
       case 'chatgpt': return 'ChatGPT';
@@ -20,11 +33,39 @@ export const TokenizerAnimation: React.FC<TokenizerAnimationProps> = ({ isProces
     <div className={`transition-all duration-500 flex flex-col items-center justify-center ${isProcessing ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
       <div className="relative">
         <div className={`${isProcessing ? 'animate-bounce-gentle' : ''} w-48 h-48 relative`}>
+          {/* Main blender image */}
           <img 
-            src="/lovable-uploads/1f905962-81be-43cc-a706-2b54b22a1976.png" 
+            src="/lovable-uploads/c1912f96-dfdc-4160-9616-f3eb4a924bfa.png"
             alt="Blender" 
             className="w-full h-full object-contain"
           />
+          
+          {/* Animated eyes for blinking effect */}
+          <div className="absolute inset-0 w-full h-full pointer-events-none">
+            {/* Left eye - visible when NOT blinking */}
+            <div 
+              className={`absolute left-[31%] top-[32%] w-[12%] h-[12%] rounded-full bg-[#222437] transition-opacity duration-100 ${isBlinking ? 'opacity-0' : 'opacity-100'}`}
+            >
+              <div className="absolute left-[15%] top-[15%] w-[25%] h-[25%] rounded-full bg-white"></div>
+            </div>
+            
+            {/* Right eye - visible when NOT blinking */}
+            <div 
+              className={`absolute right-[31%] top-[32%] w-[12%] h-[12%] rounded-full bg-[#222437] transition-opacity duration-100 ${isBlinking ? 'opacity-0' : 'opacity-100'}`}
+            >
+              <div className="absolute left-[15%] top-[15%] w-[25%] h-[25%] rounded-full bg-white"></div>
+            </div>
+            
+            {/* Left eye - closed/blinking state */}
+            <div 
+              className={`absolute left-[31%] top-[38%] w-[12%] h-[1%] rounded-full bg-[#222437] transition-opacity duration-100 ${isBlinking ? 'opacity-100' : 'opacity-0'}`}
+            ></div>
+            
+            {/* Right eye - closed/blinking state */}
+            <div 
+              className={`absolute right-[31%] top-[38%] w-[12%] h-[1%] rounded-full bg-[#222437] transition-opacity duration-100 ${isBlinking ? 'opacity-100' : 'opacity-0'}`}
+            ></div>
+          </div>
           
           {/* Add animated particles when processing */}
           {isProcessing && (

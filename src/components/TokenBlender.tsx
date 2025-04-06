@@ -40,7 +40,7 @@ export const TokenBlender: React.FC = () => {
     initTiktoken();
   }, []);
   
-  // Tokenize the text using tiktoken
+  // Tokenize the text and extract the original text segments
   const tokenizeText = async (text: string) => {
     if (!text.trim()) {
       toast.error("Please enter some text to tokenize");
@@ -56,7 +56,6 @@ export const TokenBlender: React.FC = () => {
     setShowResults(false);
     
     try {
-      // Using cl100k_base encoding (the one used by GPT-4 and GPT-3.5-turbo)
       console.log("Creating encoding...");
       const encoding = await get_encoding("cl100k_base");
       console.log("Encoding created");
@@ -65,21 +64,42 @@ export const TokenBlender: React.FC = () => {
       const tokenIds = encoding.encode(text);
       console.log("Text encoded, token IDs:", tokenIds);
       
-      // Decode each token ID back to its string representation and create token objects
-      const tokenObjects = Array.from(tokenIds).map(id => {
-        try {
-          const tokenText = encoding.decode_single_token_bytes(id).toString();
-          return { text: tokenText, id };
-        } catch (e) {
-          console.error("Error decoding token:", id, e);
-          return { text: "[error]", id };
-        }
-      });
+      // We need to extract the original text segments that correspond to each token
+      let currentText = text;
+      let tokensWithText: { text: string; id: number }[] = [];
       
-      // Count words (simple space-based splitting for now)
+      // Process each token ID
+      for (const id of tokenIds) {
+        // Decode the token to bytes, then to string
+        const tokenBytes = encoding.decode_single_token_bytes(id);
+        const tokenText = Buffer.from(tokenBytes).toString();
+        
+        // Find where this token appears in the remaining text
+        let startIndex = 0;
+        
+        // Special handling for tokens that might not match directly
+        // This is a simplified approach - a more robust solution would handle all edge cases
+        if (currentText.startsWith(tokenText)) {
+          // If the token text matches the start of the current text
+          tokensWithText.push({ text: tokenText, id });
+          // Move to the next portion of text
+          currentText = currentText.slice(tokenText.length);
+        } else {
+          // If we can't find an exact match, use the decoded token
+          // This is a fallback for special tokens or unusual encodings
+          tokensWithText.push({ text: tokenText, id });
+          
+          // Try to advance the currentText by the token's length if possible
+          if (currentText.length >= tokenText.length) {
+            currentText = currentText.slice(tokenText.length);
+          }
+        }
+      }
+      
+      // Count words (simple space-based splitting)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);
       
-      setTokens(tokenObjects);
+      setTokens(tokensWithText);
       setWordCount(words.length);
       setTokenCount(tokenIds.length);
       

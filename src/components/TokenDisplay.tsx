@@ -36,7 +36,7 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({ token, tokenId, colo
             <span className="text-muted-foreground">Display:</span>
             <span className="font-mono font-medium">{displayToken}</span>
             
-            <span className="text-muted-foreground">Raw:</span>
+            <span className="text-muted-foreground">Original Text:</span>
             <span className="font-mono font-medium">{token === " " ? "space" : token}</span>
             
             <span className="text-muted-foreground">Token ID:</span>

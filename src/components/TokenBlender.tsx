@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +40,9 @@ export const TokenBlender: React.FC = () => {
       const tokenIds = encoding.encode(text);
       
       // Decode each token ID back to its string representation
-      const tokenStrings = tokenIds.map(id => encoding.decode_single_token_bytes(id).toString());
+      const tokenStrings = Array.from(tokenIds).map(id => 
+        encoding.decode_single_token_bytes(id).toString()
+      );
       
       // Count words (simple space-based splitting for now)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);

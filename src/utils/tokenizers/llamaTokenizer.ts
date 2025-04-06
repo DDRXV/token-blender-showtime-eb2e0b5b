@@ -1,6 +1,55 @@
 import { Token } from '../types';
+import { pipeline } from '@huggingface/transformers';
 
-// Simplified Llama tokenization simulation
+// Keep track of tokenizer instance
+let llamaTokenizer: any = null;
+
+// Initialize the Llama tokenizer
+export const initializeLlamaTokenizer = async () => {
+  if (!llamaTokenizer) {
+    try {
+      // Using pipeline for tokenization from transformers.js
+      llamaTokenizer = await pipeline('tokenization', 'meta-llama/Llama-2-7b-hf');
+      console.log("Llama tokenizer initialized successfully");
+      return true;
+    } catch (error) {
+      console.error("Failed to initialize Llama tokenizer:", error);
+      return false;
+    }
+  }
+  return true;
+};
+
+// Tokenize text using the Llama tokenizer
+export const tokenizeWithLlama = async (text: string): Promise<Token[]> => {
+  if (!llamaTokenizer) {
+    const initialized = await initializeLlamaTokenizer();
+    if (!initialized) {
+      // Fall back to simulation if initialization fails
+      return simulateLlamaTokenization(text);
+    }
+  }
+  
+  try {
+    const tokenization = await llamaTokenizer(text);
+    console.log("Raw Llama tokenization result:", tokenization);
+    
+    // Convert the tokenization result to our Token interface
+    const tokens: Token[] = tokenization.tokens.map((token: string, index: number) => ({
+      text: token,
+      id: tokenization.input_ids[index]
+    }));
+    
+    return tokens;
+  } catch (error) {
+    console.error("Error tokenizing with Llama:", error);
+    // Fall back to simulation if tokenization fails
+    console.log("Falling back to simulated tokenization");
+    return simulateLlamaTokenization(text);
+  }
+};
+
+// Simplified Llama tokenization simulation as fallback
 export const simulateLlamaTokenization = (text: string): Token[] => {
   if (!text) return [];
   

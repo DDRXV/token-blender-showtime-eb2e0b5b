@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { tokenizeWithChatGPT } from '../utils/tokenizers/chatGptTokenizer';
-import { simulateLlamaTokenization } from '../utils/tokenizers/llamaTokenizer';
+import { tokenizeWithLlama, initializeLlamaTokenizer, simulateLlamaTokenization } from '../utils/tokenizers/llamaTokenizer';
 import { Token, TokenizationModel } from '../utils/types';
 import { get_encoding } from 'tiktoken';
 
 export const useTokenizer = () => {
   const [isEncodingReady, setIsEncodingReady] = useState<boolean>(false);
+  const [isLlamaReady, setIsLlamaReady] = useState<boolean>(false);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [tokens, setTokens] = useState<Token[]>([]);
@@ -22,6 +23,10 @@ export const useTokenizer = () => {
         const encoding = await get_encoding("cl100k_base");
         encoding.free();
         setIsEncodingReady(true);
+
+        // Initialize Llama tokenizer
+        const llamaInitialized = await initializeLlamaTokenizer();
+        setIsLlamaReady(llamaInitialized);
       } catch (error) {
         console.error("Failed to initialize tokenizers:", error);
         toast.error("Failed to initialize tokenizers. Please try reloading the page.");
@@ -38,7 +43,7 @@ export const useTokenizer = () => {
     }
     
     if (model === 'chatgpt' && !isEncodingReady) {
-      toast.error("Tokenizer is not ready yet. Please wait a moment and try again.");
+      toast.error("ChatGPT tokenizer is not ready yet. Please wait a moment and try again.");
       return;
     }
     
@@ -54,7 +59,12 @@ export const useTokenizer = () => {
           tokensList = await tokenizeWithChatGPT(text);
           break;
         case 'llama':
-          tokensList = simulateLlamaTokenization(text);
+          if (isLlamaReady) {
+            tokensList = await tokenizeWithLlama(text);
+          } else {
+            console.log("Llama tokenizer not ready, using simulation");
+            tokensList = simulateLlamaTokenization(text);
+          }
           console.log("Llama tokenization complete", tokensList);
           break;
       }
@@ -81,6 +91,7 @@ export const useTokenizer = () => {
 
   return {
     isEncodingReady,
+    isLlamaReady,
     isProcessing,
     showResults,
     tokens,

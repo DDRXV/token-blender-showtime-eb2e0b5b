@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { TokenizationModel } from '../utils/types';
-import { ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -63,7 +61,7 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Type your sentence here..."
-              className="min-h-[80px] border-dyyota-blue/20 focus-visible:ring-dyyota-blue/30 resize-none py-2"
+              className="min-h-[120px] border-dyyota-blue/20 focus-visible:ring-dyyota-blue/30 resize-none py-2"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && e.ctrlKey) onTokenize(inputText);
               }}
@@ -111,3 +109,5 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
     </Card>
   );
 };
+
+export default TokenizerInput;

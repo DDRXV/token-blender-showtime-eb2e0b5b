@@ -29,7 +29,7 @@ export const TokenBlender: React.FC = () => {
         onModelChange={setModel}
       />
       
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-5">
         <div className="flex items-center">
           <div className="flex-1">
             <TokenizerInput 

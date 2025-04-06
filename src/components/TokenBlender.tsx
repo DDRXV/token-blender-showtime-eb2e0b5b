@@ -22,6 +22,23 @@ export const TokenBlender: React.FC = () => {
   const [tokenCount, setTokenCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [isEncodingReady, setIsEncodingReady] = useState<boolean>(false);
+  
+  useEffect(() => {
+    // Check if tiktoken is working by initializing it once
+    const initTiktoken = async () => {
+      try {
+        const encoding = await get_encoding("cl100k_base");
+        encoding.free();
+        setIsEncodingReady(true);
+      } catch (error) {
+        console.error("Failed to initialize tiktoken:", error);
+        toast.error("Failed to initialize tokenizer. Please try reloading the page.");
+      }
+    };
+    
+    initTiktoken();
+  }, []);
   
   // Tokenize the text using tiktoken
   const tokenizeText = async (text: string) => {
@@ -30,20 +47,33 @@ export const TokenBlender: React.FC = () => {
       return;
     }
     
+    if (!isEncodingReady) {
+      toast.error("Tokenizer is not ready yet. Please wait a moment and try again.");
+      return;
+    }
+    
     setIsProcessing(true);
     setShowResults(false);
     
     try {
       // Using cl100k_base encoding (the one used by GPT-4 and GPT-3.5-turbo)
+      console.log("Creating encoding...");
       const encoding = await get_encoding("cl100k_base");
+      console.log("Encoding created");
       
       // Get token IDs
       const tokenIds = encoding.encode(text);
+      console.log("Text encoded, token IDs:", tokenIds);
       
       // Decode each token ID back to its string representation
-      const tokenStrings = Array.from(tokenIds).map(id => 
-        encoding.decode_single_token_bytes(id).toString()
-      );
+      const tokenStrings = Array.from(tokenIds).map(id => {
+        try {
+          return encoding.decode_single_token_bytes(id).toString();
+        } catch (e) {
+          console.error("Error decoding token:", id, e);
+          return "[error]";
+        }
+      });
       
       // Count words (simple space-based splitting for now)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);
@@ -59,6 +89,7 @@ export const TokenBlender: React.FC = () => {
       }, 2000);
       
       encoding.free();
+      console.log("Tokenization complete");
     } catch (error) {
       console.error("Tokenization error:", error);
       toast.error("Error tokenizing text. Please try again.");

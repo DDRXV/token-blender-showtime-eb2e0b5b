@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +39,7 @@ export const TokenBlender: React.FC = () => {
     initTiktoken();
   }, []);
   
-  // Tokenize the text and extract the original text segments
+  // Tokenize the text using tiktoken
   const tokenizeText = async (text: string) => {
     if (!text.trim()) {
       toast.error("Please enter some text to tokenize");
@@ -64,42 +63,39 @@ export const TokenBlender: React.FC = () => {
       const tokenIds = encoding.encode(text);
       console.log("Text encoded, token IDs:", tokenIds);
       
-      // We need to extract the original text segments that correspond to each token
-      let currentText = text;
-      let tokensWithText: { text: string; id: number }[] = [];
+      // Extract original text for each token
+      let tokensList: { text: string; id: number }[] = [];
       
-      // Process each token ID
-      for (const id of tokenIds) {
-        // Decode the token to bytes, then to string
-        const tokenBytes = encoding.decode_single_token_bytes(id);
-        const tokenText = Buffer.from(tokenBytes).toString();
+      // Split the input text into tokens directly
+      // We'll use the encoded token IDs to decode their text representation
+      const tokenTexts = encoding.decode(tokenIds);
+      
+      // Map through the token IDs to create our token objects
+      tokenIds.forEach((id, index) => {
+        // Get the individual token text by decoding just this token ID
+        // This will just create a byte array, which we can convert to a character
+        const singleToken = encoding.decode([id]);
         
-        // Find where this token appears in the remaining text
-        let startIndex = 0;
-        
-        // Special handling for tokens that might not match directly
-        // This is a simplified approach - a more robust solution would handle all edge cases
-        if (currentText.startsWith(tokenText)) {
-          // If the token text matches the start of the current text
-          tokensWithText.push({ text: tokenText, id });
-          // Move to the next portion of text
-          currentText = currentText.slice(tokenText.length);
-        } else {
-          // If we can't find an exact match, use the decoded token
-          // This is a fallback for special tokens or unusual encodings
-          tokensWithText.push({ text: tokenText, id });
-          
-          // Try to advance the currentText by the token's length if possible
-          if (currentText.length >= tokenText.length) {
-            currentText = currentText.slice(tokenText.length);
-          }
+        // Get the actual text for this token
+        let tokenText = '';
+        try {
+          // The character representation of this token may be a visible character, whitespace, etc.
+          tokenText = String.fromCodePoint(...singleToken);
+        } catch (e) {
+          // Fallback for tokens that can't be represented as a single character
+          tokenText = `<Token ${id}>`;
         }
-      }
+        
+        tokensList.push({
+          text: tokenText,
+          id: id
+        });
+      });
       
       // Count words (simple space-based splitting)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);
       
-      setTokens(tokensWithText);
+      setTokens(tokensList);
       setWordCount(words.length);
       setTokenCount(tokenIds.length);
       

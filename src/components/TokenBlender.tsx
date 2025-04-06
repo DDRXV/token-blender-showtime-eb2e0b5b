@@ -79,17 +79,31 @@ export const TokenBlender: React.FC = () => {
           />
         </div>
         
-        {/* Results and animation section */}
-        <div className="relative">
-          {/* Centered animation that shows during processing */}
-          <div className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${isProcessing ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-            <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-lg">
+        {/* Mobile Animation */}
+        {isMobile && isProcessing && (
+          <div className="flex justify-center">
+            <div className="bg-white/90 p-4 rounded-xl shadow-lg">
               <TokenizerAnimation 
                 isProcessing={isProcessing}
                 model={model}
               />
             </div>
           </div>
+        )}
+        
+        {/* Results and animation section */}
+        <div className="relative">
+          {/* Centered animation that shows during processing - only on desktop */}
+          {!isMobile && (
+            <div className={`absolute inset-0 flex items-center justify-center z-10 transition-opacity duration-500 ${isProcessing ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+              <div className="bg-white/80 backdrop-blur-sm p-4 sm:p-6 rounded-xl shadow-lg">
+                <TokenizerAnimation 
+                  isProcessing={isProcessing}
+                  model={model}
+                />
+              </div>
+            </div>
+          )}
           
           {/* Results with opacity transition */}
           <div className={`transition-opacity duration-500 ${isProcessing ? 'opacity-30' : 'opacity-100'}`}>

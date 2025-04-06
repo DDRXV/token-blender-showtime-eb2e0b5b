@@ -34,28 +34,18 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
       <div className="flex flex-col gap-3">
         {isMobile ? (
           <>
-            <div className="flex justify-between items-center gap-2">
-              <Select 
-                value={model}
-                onValueChange={(value: TokenizationModel) => onModelChange(value)}
-              >
-                <SelectTrigger className="w-full h-10 bg-dyyota-lightBlue border-dyyota-blue/20">
-                  <SelectValue placeholder="Select model" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="chatgpt">ChatGPT</SelectItem>
-                  <SelectItem value="llama">Llama</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              <Button 
-                onClick={() => onTokenize(inputText)}
-                disabled={isProcessing}
-                className="bg-dyyota-blue hover:bg-dyyota-blue/90 text-white h-10 whitespace-nowrap transition-all"
-              >
-                Tokenize
-              </Button>
-            </div>
+            <Select 
+              value={model}
+              onValueChange={(value: TokenizationModel) => onModelChange(value)}
+            >
+              <SelectTrigger className="w-full h-10 bg-dyyota-lightBlue border-dyyota-blue/20">
+                <SelectValue placeholder="Select model" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="chatgpt">ChatGPT</SelectItem>
+                <SelectItem value="llama">Llama</SelectItem>
+              </SelectContent>
+            </Select>
             
             <Textarea
               value={inputText}
@@ -66,6 +56,14 @@ export const TokenizerInput: React.FC<TokenizerInputProps> = ({
                 if (e.key === 'Enter' && e.ctrlKey) onTokenize(inputText);
               }}
             />
+            
+            <Button 
+              onClick={() => onTokenize(inputText)}
+              disabled={isProcessing}
+              className="bg-dyyota-blue hover:bg-dyyota-blue/90 text-white w-full h-10 transition-all"
+            >
+              Tokenize
+            </Button>
           </>
         ) : (
           <div className="flex items-end gap-3">

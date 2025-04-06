@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,31 +67,33 @@ export const TokenBlender: React.FC = () => {
       // Extract original text for each token
       let tokensList: { text: string; id: number }[] = [];
       
-      // Split the input text into tokens directly
-      // We'll use the encoded token IDs to decode their text representation
-      const tokenTexts = encoding.decode(tokenIds);
-      
-      // Map through the token IDs to create our token objects
-      tokenIds.forEach((id, index) => {
-        // Get the individual token text by decoding just this token ID
-        // This will just create a byte array, which we can convert to a character
-        const singleToken = encoding.decode([id]);
+      // Process each token ID individually
+      for (let i = 0; i < tokenIds.length; i++) {
+        const id = tokenIds[i];
         
-        // Get the actual text for this token
-        let tokenText = '';
+        // Convert the single token ID to a Uint32Array
+        const tokenIdArray = new Uint32Array([id]);
+        
         try {
-          // The character representation of this token may be a visible character, whitespace, etc.
-          tokenText = String.fromCodePoint(...singleToken);
+          // Decode this single token ID to get its bytes representation
+          const bytes = encoding.decode(tokenIdArray);
+          
+          // Convert the bytes to a string 
+          const tokenText = String.fromCharCode(...bytes);
+          
+          tokensList.push({
+            text: tokenText || `<Token ${id}>`,
+            id: id
+          });
         } catch (e) {
-          // Fallback for tokens that can't be represented as a single character
-          tokenText = `<Token ${id}>`;
+          console.error(`Error decoding token ID ${id}:`, e);
+          // Fallback for tokens that can't be decoded properly
+          tokensList.push({
+            text: `<Token ${id}>`,
+            id: id
+          });
         }
-        
-        tokensList.push({
-          text: tokenText,
-          id: id
-        });
-      });
+      }
       
       // Count words (simple space-based splitting)
       const words = text.trim().split(/\s+/).filter(word => word.length > 0);
